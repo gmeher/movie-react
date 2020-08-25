@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { API_URL, API_KEY, IMAGE_BASE_URL, POSTER_SIZE } from '../../config';
+import React, {Component} from 'react';
+import {API_URL, API_KEY, IMAGE_BASE_URL, POSTER_SIZE} from '../../config';
 import Section from 'react-bulma-components/lib/components/section';
 import Container from 'react-bulma-components/lib/components/container';
 import Columns from 'react-bulma-components/lib/components/columns';
@@ -11,19 +11,18 @@ import PersonHeader from '../elements/PersonHeader/PersonHeader';
 import NoPoster from './no_poster.svg';
 import './BrowseByActor.scss';
 
-
-class BrowseByActor extends Component {  
+class BrowseByActor extends Component {
   state = {
     movies: [],
     loading: false,
     currentPage: 0,
-    totalPages: 0
-  }  
+    totalPages: 0,
+  };
 
   componentDidMount() {
-    const { actorId } = this.props.match.params;
+    const {actorId} = this.props.match.params;
     this.setState({
-      loading: true
+      loading: true,
     });
     const endpoint = `${API_URL}discover/movie?api_key=${API_KEY}&with_cast=${actorId}&language=en-US&&sort_by=release_date.desc&page=1`;
     const personEndpoint = `${API_URL}person/${actorId}?api_key=${API_KEY}&language=en-US`;
@@ -31,10 +30,10 @@ class BrowseByActor extends Component {
     this.fetchActor(personEndpoint);
   }
 
-  fetchActor = async personEndpoint => {
+  fetchActor = async (personEndpoint) => {
     try {
       const personResult = await (await fetch(personEndpoint)).json();
-      const { actorId } = this.props.match.params;
+      const {actorId} = this.props.match.params;
       this.setState({
         name: personResult.name,
         birthday: personResult.birthday,
@@ -45,47 +44,64 @@ class BrowseByActor extends Component {
         profile_path: personResult.profile_path,
         imdb_id: personResult.imdb_id,
         tmdb_id: actorId,
-        homepage: personResult.homepage
-      })
-    } catch(error) {
+        homepage: personResult.homepage,
+      });
+    } catch (error) {
       console.log('error: ', error);
     }
-  }
+  };
 
-  fetchItems = async endpoint => {
+  fetchItems = async (endpoint) => {
     try {
-      const { movies } = this.state;
+      const {movies} = this.state;
       const result = await (await fetch(endpoint)).json();
       this.setState({
         movies: [...movies, ...result.results],
         loading: false,
         currentPage: result.page,
-        totalPages: result.total_pages
-      })
-    } catch(error) {
+        totalPages: result.total_pages,
+      });
+    } catch (error) {
       console.log('error: ', error);
     }
-  }
+  };
 
   loadMoreItems = () => {
-    const { actorId } = this.props.match.params;
-    const { currentPage } = this.state;
-    const endpoint = `${API_URL}discover/movie?api_key=${API_KEY}&with_cast=${actorId}&language=en-US&sort_by=release_date.desc&page=${currentPage + 1}`;
+    const {actorId} = this.props.match.params;
+    const {currentPage} = this.state;
+    const endpoint = `${API_URL}discover/movie?api_key=${API_KEY}&with_cast=${actorId}&language=en-US&sort_by=release_date.desc&page=${
+      currentPage + 1
+    }`;
     this.setState({
-      loading: true
+      loading: true,
     });
     this.fetchItems(endpoint);
-  }
+  };
 
   render() {
-    const { biography, birthday, currentPage, deathday, gender, homepage, imdb_id, loading, movies, name, place_of_birth, profile_path, tmdb_id, totalPages } = this.state;
-    return(
+    const {
+      biography,
+      birthday,
+      currentPage,
+      deathday,
+      gender,
+      homepage,
+      imdb_id,
+      loading,
+      movies,
+      name,
+      place_of_birth,
+      profile_path,
+      tmdb_id,
+      totalPages,
+    } = this.state;
+    return (
       <>
-        {name ?       
-          <Section className="browse-by-actor">
-            <Container>          
+        {name ? (
+          <Section className='browse-by-actor'>
+            <Container>
               <Columns>
-                <Columns.Column tablet={{ size: 4 }} desktop={{ size: 3 }}>
+                <Columns.Column tablet={{size: 4}} desktop={{size: 3}}>
                   <PersonHeader
                     name={name}
                     birthday={birthday}
@@ -99,52 +115,54 @@ class BrowseByActor extends Component {
                     homepage={homepage}
                   />
                 </Columns.Column>
-                <Columns.Column tablet={{ size: 8 }} desktop={{ size: 9 }}>
+                <Columns.Column tablet={{size: 8}} desktop={{size: 9}}>
                   <ThumbnailGrid
                     preHeader='Movies Starring'
                     header={name}
-                    loading={loading}
-                  >
+                    loading={loading}>
                     {movies.map((element, i) => {
-                      return <Thumbnail
-                        key={i}
-                        clickable={true}
-                        image={element.poster_path ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}` : NoPoster}
-                        movieId={element.id}
-                        movieName={element.title}
-                        originalTitle={element.original_title}
-                        releaseDate={element.release_date}
-                        voteAverage={element.vote_average}
+                      return (
+                        <Thumbnail
+                          key={i}
+                          clickable={true}
+                          image={
+                            element.poster_path
+                              ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}`
+                              : NoPoster
+                          }
+                          movieId={element.id}
+                          movieName={element.title}
+                          originalTitle={element.original_title}
+                          releaseDate={element.release_date}
+                          voteAverage={element.vote_average}
                         />
+                      );
                     })}
                   </ThumbnailGrid>
                   {loading ? <LoadingCircle /> : null}
-                  {(currentPage < totalPages && !loading) ?
+                  {currentPage < totalPages && !loading ? (
                     <LoadMoreButton
-                      text="Load More Movies"
+                      text='Load More Movies'
                       onClick={this.loadMoreItems}
                     />
-                    : null
-                  }
+                  ) : null}
                 </Columns.Column>
-              </Columns>                                         
+              </Columns>
             </Container>
           </Section>
-          :
-          null
-        }
-        {!loading && !movies ?
-          <Section className="has-text-centered person-not-found">
+        ) : null}
+        {!loading && !movies ? (
+          <Section className='has-text-centered person-not-found'>
             <Container>
-              <h1 className="glitch">Could not find this person</h1>
-              <p>Go back to <a href="/">Home page</a></p>
-            </Container>       
+              <h1 className='glitch'>Could not find this person</h1>
+              <p>
+                Go back to <a href='/'>Home page</a>
+              </p>
+            </Container>
           </Section>
-          :
-          null
-        }
+        ) : null}
       </>
-    )
+    );
   }
 }
 

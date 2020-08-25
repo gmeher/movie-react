@@ -4,15 +4,17 @@ import Container from 'react-bulma-components/lib/components/container';
 import './NotFound.scss';
 
 const NotFound = () => {
-  return(
-    <Section className="has-text-centered not-found">
+  return (
+    <Section className='has-text-centered not-found'>
       <Container>
-        <h1 className="glitch">404</h1>
+        <h1 className='glitch'>404</h1>
         <p>This page doesn't exist.</p>
-        <p>Go back to <a href="/">Home page</a></p>
-      </Container>       
-    </Section>    
-  )
-}
+        <p>
+          Go back to <a href='/'>Home page</a>
+        </p>
+      </Container>
+    </Section>
+  );
+};
 
 export default NotFound;

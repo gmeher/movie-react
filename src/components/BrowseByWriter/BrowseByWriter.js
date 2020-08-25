@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { API_URL, API_KEY, IMAGE_BASE_URL, POSTER_SIZE } from '../../config';
-import { compareValues } from '../../helpers';
+import React, {Component} from 'react';
+import {API_URL, API_KEY, IMAGE_BASE_URL, POSTER_SIZE} from '../../config';
+import {compareValues} from '../../helpers';
 import Section from 'react-bulma-components/lib/components/section';
 import Container from 'react-bulma-components/lib/components/container';
 import Columns from 'react-bulma-components/lib/components/columns';
@@ -11,26 +11,25 @@ import PersonHeader from '../elements/PersonHeader/PersonHeader';
 import NoPoster from './no_poster.svg';
 import './BrowseByWriter.scss';
 
-
 class BrowseByWriter extends Component {
   state = {
     movies: [],
-    loading: false
-  }
-  
+    loading: false,
+  };
+
   componentDidMount() {
-    const { writerId } = this.props.match.params;
+    const {writerId} = this.props.match.params;
     this.setState({
-      loading: true
+      loading: true,
     });
     const endpoint = `${API_URL}person/${writerId}/movie_credits?api_key=${API_KEY}&language=en-US`;
     const personEndpoint = `${API_URL}person/${writerId}?api_key=${API_KEY}&language=en-US`;
-    this.fetchPerson(personEndpoint);    
+    this.fetchPerson(personEndpoint);
     this.fetchItems(endpoint);
   }
 
-  fetchPerson = async personEndpoint => {
-    const { writerId } = this.props.match.params;
+  fetchPerson = async (personEndpoint) => {
+    const {writerId} = this.props.match.params;
     try {
       const resultPerson = await (await fetch(personEndpoint)).json();
       this.setState({
@@ -43,38 +42,53 @@ class BrowseByWriter extends Component {
         profile_path: resultPerson.profile_path,
         imdb_id: resultPerson.imdb_id,
         tmdb_id: writerId,
-        homepage: resultPerson.homepage
+        homepage: resultPerson.homepage,
       });
-    } catch(error) {
+    } catch (error) {
       console.log('error: ', error);
     }
-  }
+  };
 
-  fetchItems = async endpoint => {
+  fetchItems = async (endpoint) => {
     try {
       const result = await (await fetch(endpoint)).json();
       const writtenMovies = result.crew.filter(
-        (member) => member.job === 'Screenplay'
+        (member) => member.job === 'Screenplay',
       );
-      const writtenMoviesSorted = writtenMovies.sort(compareValues('release_date', 'desc'));
+      const writtenMoviesSorted = writtenMovies.sort(
+        compareValues('release_date', 'desc'),
+      );
       this.setState({
         movies: writtenMoviesSorted,
-        loading: false
+        loading: false,
       });
-    } catch(error) {
+    } catch (error) {
       console.log('error: ', error);
     }
-  }
+  };
 
   render() {
-    const { biography, birthday, deathday, gender, homepage, imdb_id, loading, movies, name, place_of_birth, profile_path, tmdb_id } = this.state;
-    return(
+    const {
+      biography,
+      birthday,
+      deathday,
+      gender,
+      homepage,
+      imdb_id,
+      loading,
+      movies,
+      name,
+      place_of_birth,
+      profile_path,
+      tmdb_id,
+    } = this.state;
+    return (
       <>
-        {name ?       
-          <Section className="browse-by-writer">
-            <Container>          
+        {name ? (
+          <Section className='browse-by-writer'>
+            <Container>
               <Columns>
-                <Columns.Column tablet={{ size: 4 }} desktop={{ size: 3 }}>
+                <Columns.Column tablet={{size: 4}} desktop={{size: 3}}>
                   <PersonHeader
                     name={name}
                     birthday={birthday}
@@ -88,45 +102,48 @@ class BrowseByWriter extends Component {
                     homepage={homepage}
                   />
                 </Columns.Column>
-                <Columns.Column tablet={{ size: 8 }} desktop={{ size: 9 }}>
+                <Columns.Column tablet={{size: 8}} desktop={{size: 9}}>
                   <ThumbnailGrid
                     preHeader='Movies Written By'
                     header={name}
-                    loading={loading}
-                  >
+                    loading={loading}>
                     {movies.map((element, i) => {
-                      return <Thumbnail
-                        key={i}
-                        clickable={true}
-                        image={element.poster_path ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}` : NoPoster}
-                        movieId={element.id}
-                        movieName={element.title}
-                        originalTitle={element.original_title}
-                        releaseDate={element.release_date}
-                        voteAverage={element.vote_average}
+                      return (
+                        <Thumbnail
+                          key={i}
+                          clickable={true}
+                          image={
+                            element.poster_path
+                              ? `${IMAGE_BASE_URL}${POSTER_SIZE}${element.poster_path}`
+                              : NoPoster
+                          }
+                          movieId={element.id}
+                          movieName={element.title}
+                          originalTitle={element.original_title}
+                          releaseDate={element.release_date}
+                          voteAverage={element.vote_average}
                         />
+                      );
                     })}
                   </ThumbnailGrid>
                   {loading ? <LoadingCircle /> : null}
                 </Columns.Column>
-              </Columns>                                         
+              </Columns>
             </Container>
           </Section>
-          :
-          null
-        }
-        {!loading && !movies ?
-          <Section className="has-text-centered person-not-found">
+        ) : null}
+        {!loading && !movies ? (
+          <Section className='has-text-centered person-not-found'>
             <Container>
-              <h1 className="glitch">Could not find this person</h1>
-              <p>Go back to <a href="/">Home page</a></p>
-            </Container>       
+              <h1 className='glitch'>Could not find this person</h1>
+              <p>
+                Go back to <a href='/'>Home page</a>
+              </p>
+            </Container>
           </Section>
-          :
-          null
-        }
+        ) : null}
       </>
-    )
+    );
   }
 }
 
